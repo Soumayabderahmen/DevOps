@@ -1,0 +1,59 @@
+# Configure 'Deployment' of MySQL server
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: jenkins
+  labels:
+    app: mysql
+    tier: database
+spec:
+  selector: # MySQL Pod should contain same labels
+    matchLabels:
+      app: mysql
+      tier: database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels: # Must match 'Service' and 'Deployment' selectors
+        app: mysql
+        tier: database
+    spec:
+      containers:
+        - image: mysql:latest # image from Docker Hub
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: password
+
+            - name: MYSQL_DATABASE # Setting database name from a 'ConfigMap'
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: dbName
+
+          ports:
+            - containerPort: 3306
+              name: mysql
+---
+# Define a 'Service' to expose MySQL to other services
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql # DNS name
+  namespace: jenkins
+  labels:
+    app: mysql
+    tier: database
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector: # MySQL Pod should contain same labels
+    app: mysql
+    tier: database
+  clusterIP: None # We use DNS, thus ClusterIP is not relevant

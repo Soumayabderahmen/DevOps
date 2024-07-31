@@ -1,0 +1,53 @@
+version: "3"
+services:
+  springboot-app:
+    # container_name: spring-app
+    image: soumayaabderahmen/springboot-app
+    restart: always
+    build: ./IronByteIntern
+    ports:
+      - 8060:8080
+    networks:
+      - networkmysql
+    volumes:
+      #-  /home/user/Desktop/db:/var/lib/mysql
+      #- C:/Users/TROOPY/Desktop/db:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_HOST: mysqldb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_PORT: 3306
+  mysqldb:
+    container_name: mysqldb
+    image: mysql
+    volumes:
+      #-  /home/user/Desktop/db:/var/lib/mysql
+      #- C:/Users/TROOPY/Desktop/db:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+    ports:
+      - 3308:3306
+    networks:
+      - networkmysql
+    environment:
+      MYSQL_DATABASE: ironbyte
+      MYSQL_ROOT_PASSWORD: root
+  angular:
+      image: soumayaabderahmen/ironbytepipeline-angular
+      build: ./IronByte
+      ports:
+      - "4200:80"
+      networks:
+      - networkmysql
+      volumes:
+      #-  /home/user/Desktop/db:/var/lib/mysql
+      #- C:/Users/TROOPY/Desktop/db:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+     
+
+networks:
+  networkmysql:
+    driver: bridge
+volumes:
+  mysql-data:
+
