@@ -24,18 +24,21 @@ pipeline {
             }
         }
         
-        stage('Build') {
-            steps {
-                script {
-                    echo "Building the application..."
-                    sh 'mvn clean install -f IronByteIntern/pom.xml'
-                    dir('IronByte') {
-                        sh 'npm install'
-                        sh 'npm run build'
-                    }
-                }
+       stage('Build') {
+    steps {
+        script {
+            echo "Building the application..."
+            withMaven(maven: 'Maven') {
+                sh 'mvn clean install -f IronByteIntern/pom.xml'
+            }
+            dir('IronByte') {
+                sh 'npm install'
+                sh 'npm run build'
             }
         }
+    }
+}
+
         
         stage('Build Docker Images') {
             steps {
