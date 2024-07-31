@@ -33,11 +33,11 @@ pipeline {
                 script {
                     echo "Building the application..."
                     withMaven(maven: 'Maven') {
-                        bat 'mvn clean install -f IronByteIntern/pom.xml'
+                        sh 'mvn clean install -f IronByteIntern/pom.xml'
                     }
                     dir('IronByte') {
-                        bat 'npm install --silent'
-                        bat 'npm run build --silent'
+                        sh 'npm install --silent'
+                        sh 'npm run build --silent'
                     }
                 }
             }
@@ -48,9 +48,9 @@ pipeline {
                 script {
                     echo "Pushing Docker images to Docker Hub..."
                     withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
-                        bat "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyteintern:latest"
-                        bat "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyte:latest"
+                        sh 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
+                        sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyteintern:latest"
+                        sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyte:latest"
                     }
                 }
             }
@@ -60,7 +60,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application using Docker Compose..."
-                    bat 'docker-compose -f docker-compose.yml up --build -d'
+                    sh 'docker-compose -f docker-compose.yml up --build -d'
                 }
             }
         }
@@ -69,11 +69,11 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application to Minikube..."
-                    bat 'kubectl apply -f ironbyteintern/backend-deployment.yaml -n jenkins'
-                    bat 'kubectl apply -f ironbyteintern/mysql-configMap.yaml -n jenkins'
-                    bat 'kubectl apply -f ironbyteintern/mysql-secrets.yaml -n jenkins'
-                    bat 'kubectl apply -f ironbyteintern/db-deployment.yaml -n jenkins'
-                    bat 'kubectl apply -f ironbyte/frontend-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyteintern/backend-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyteintern/mysql-configMap.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyteintern/mysql-secrets.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyteintern/db-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyte/frontend-deployment.yaml -n jenkins'
                 }
             }
         }
