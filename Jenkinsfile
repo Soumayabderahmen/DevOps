@@ -36,8 +36,8 @@ pipeline {
                         sh 'mvn clean install -f IronByteIntern/pom.xml'
                     }
                     dir('IronByte') {
-                        sh 'npm install'
-                        sh 'npm run build'
+                        sh 'npm install --silent'
+                        sh 'npm run build --silent'
                     }
                 }
             }
@@ -77,15 +77,11 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application to Minikube..."
-                    dir('IronByteIntern') {
-                        sh 'kubectl apply -f backend-deployment.yaml -n jenkins'
-                        sh 'kubectl apply -f mysql-configMap.yaml -n jenkins'
-                        sh 'kubectl apply -f mysql-secrets.yaml -n jenkins'
-                        sh 'kubectl apply -f db-deployment.yaml -n jenkins'
-                    }
-                    dir('IronByte') {
-                        sh 'kubectl apply -f frontend-deployment.yaml -n jenkins'
-                    }
+                    sh 'kubectl apply -f ironbyteintern/backend-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyteintern/mysql-configMap.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyteintern/mysql-secrets.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyteintern/db-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyte/frontend-deployment.yaml -n jenkins'
                 }
             }
         }
