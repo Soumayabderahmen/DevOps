@@ -48,7 +48,7 @@ pipeline {
                 script {
                     echo "Pushing Docker images to Docker Hub..."
                     withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                         sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyteintern:latest"
                         sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyte:latest"
                     }
