@@ -10,9 +10,13 @@ pipeline {
         MYSQL_PASSWORD = 'root'
         DOCKERHUB_NAMESPACE = 'soumayaabderahmen'
         GITHUB_CREDENTIALS_ID = 'Soumaya' // Replace with your GitHub credentials ID
+        NODEJS_VERSION = 'NodeJS 16' // Replace with your NodeJS tool name configured in Jenkins
     }
     
-   
+    tools {
+        nodejs "${env.NODEJS_VERSION}" // Using the configured NodeJS version
+        maven 'Maven' // Using the configured Maven version
+    }
     
     stages {
         stage('Checkout') {
@@ -24,21 +28,20 @@ pipeline {
             }
         }
         
-       stage('Build') {
-    steps {
-        script {
-            echo "Building the application..."
-            withMaven(maven: 'Maven') {
-                sh 'mvn clean install -f IronByteIntern/pom.xml'
-            }
-            dir('IronByte') {
-                sh 'npm install'
-                sh 'npm run build'
+        stage('Build') {
+            steps {
+                script {
+                    echo "Building the application..."
+                    withMaven(maven: 'Maven') {
+                        sh 'mvn clean install -f IronByteIntern/pom.xml'
+                    }
+                    dir('IronByte') {
+                        sh 'npm install'
+                        sh 'npm run build'
+                    }
+                }
             }
         }
-    }
-}
-
         
         stage('Build Docker Images') {
             steps {
@@ -55,7 +58,7 @@ pipeline {
                 script {
                     echo "Pushing Docker images to Docker Hub..."
                     withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
+                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                         sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyteintern:latest"
                         sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyte:latest"
                     }
@@ -69,13 +72,11 @@ pipeline {
                 sh 'docker-compose -f docker-compose.yml up --build -d'
             }
         }
+        
         stage('Deploy to K8s') {
             steps {
                 script {
                     echo "Deploying application to Minikube..."
-              
-                    
-                    // Apply Kubernetes configurations in the jenkins namespace
                     sh 'kubectl apply -f ironbyteintern/backend-deployment.yaml -n jenkins'
                     sh 'kubectl apply -f ironbyteintern/mysql-configMap.yaml -n jenkins'
                     sh 'kubectl apply -f ironbyteintern/mysql-secrets.yaml -n jenkins'
