@@ -10,7 +10,7 @@ pipeline {
         MYSQL_PASSWORD = 'root'
         DOCKERHUB_NAMESPACE = 'soumayaabderahmen'
         GITHUB_CREDENTIALS_ID = 'Soumaya' // Replace with your GitHub credentials ID
-        NODEJS_VERSION = 'NodeJS 16' // Replace with your NodeJS tool name configured in Jenkins
+        NODEJS_VERSION = 'NodeJS' // Replace with your NodeJS tool name configured in Jenkins
     }
     
     tools {
