@@ -47,10 +47,12 @@ pipeline {
             steps {
                 script {
                     echo "Pushing Docker images to Docker Hub..."
-                    withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-                        sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyteintern:latest"
-                        sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyte:latest"
+                    withCredentials([usernamePassword(credentialsId: 'soumayaabderahmen', usernameVariable: 'dockerHubUser', passwordVariable: 'dockerHubPassword')]) {
+                        sh 'echo $dockerHubPassword | docker login -u $dockerHubUser --password-stdin'
+                        sh "docker build -t ${env.DOCKERHUB_NAMESPACE}/springboot-app:latest -f DevOps/IronByteIntern/Dockerfile ."
+                        sh "docker build -t ${env.DOCKERHUB_NAMESPACE}/ironbytepipeline-angular:latest -f DevOps/IronByte/Dockerfile ."
+                        sh "docker push ${env.DOCKERHUB_NAMESPACE}/springboot-app:latest"
+                        sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbytepipeline-angular:latest"
                     }
                 }
             }
@@ -60,7 +62,9 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application using Docker Compose..."
-                    sh 'docker-compose -f docker-compose.yml up --build -d'
+                    sh 'docker-compose -f DevOps/docker-compose.yml up --build -d'
+                    sh 'docker-compose ps'  // Debug step to show the status of the Docker containers
+                    sh 'docker ps -a'  // Debug step to list all Docker containers
                 }
             }
         }
@@ -69,11 +73,11 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application to Minikube..."
-                    sh 'kubectl apply -f ironbyteintern/backend-deployment.yaml -n jenkins'
-                    sh 'kubectl apply -f ironbyteintern/mysql-configMap.yaml -n jenkins'
-                    sh 'kubectl apply -f ironbyteintern/mysql-secrets.yaml -n jenkins'
-                    sh 'kubectl apply -f ironbyteintern/db-deployment.yaml -n jenkins'
-                    sh 'kubectl apply -f ironbyte/frontend-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f DevOps/IronByteIntern/backend-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f DevOps/IronByteIntern/mysql-configMap.yaml -n jenkins'
+                    sh 'kubectl apply -f DevOps/IronByteIntern/mysql-secrets.yaml -n jenkins'
+                    sh 'kubectl apply -f DevOps/IronByteIntern/db-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f DevOps/IronByte/frontend-deployment.yaml -n jenkins'
                 }
             }
         }
@@ -82,6 +86,8 @@ pipeline {
     post {
         always {
             echo "Pipeline completed."
+            sh 'docker-compose ps'  // Debug step to show the status of the Docker containers
+            sh 'docker ps -a'  // Debug step to list all Docker containers
         }
         success {
             echo "Pipeline succeeded."
