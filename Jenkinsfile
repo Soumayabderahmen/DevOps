@@ -49,8 +49,8 @@ pipeline {
                     echo "Pushing Docker images to Docker Hub..."
                     withCredentials([usernamePassword(credentialsId: 'soumayaabderahmen', usernameVariable: 'dockerHubUser', passwordVariable: 'dockerHubPassword')]) {
                         sh 'echo $dockerHubPassword | docker login -u $dockerHubUser --password-stdin'
-                        sh "docker build -t ${env.DOCKERHUB_NAMESPACE}/springboot-app:latest -f DevOps/IronByteIntern/Dockerfile ."
-                        sh "docker build -t ${env.DOCKERHUB_NAMESPACE}/ironbytepipeline-angular:latest -f DevOps/IronByte/Dockerfile ."
+                        sh "docker build -t ${env.DOCKERHUB_NAMESPACE}/springboot-app:latest -f IRONBYTE/IronByteIntern/Dockerfile ."
+                        sh "docker build -t ${env.DOCKERHUB_NAMESPACE}/ironbytepipeline-angular:latest -f IRONBYTE/IronByte/Dockerfile ."
                         sh "docker push ${env.DOCKERHUB_NAMESPACE}/springboot-app:latest"
                         sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbytepipeline-angular:latest"
                     }
