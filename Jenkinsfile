@@ -76,11 +76,12 @@ pipeline {
     steps {
         script {
             echo "Deploying application to Minikube..."
-                sh 'kubectl apply -f IronByteIntern/backend-deployment.yaml -n jenkins'
-                sh 'kubectl apply -f IronByteIntern/mysql-configMap.yaml -n jenkins'
-                sh 'kubectl apply -f IronByteIntern/mysql-secrets.yaml -n jenkins'
-                sh 'kubectl apply -f IronByteIntern/db-deployment.yaml -n jenkins'
-                sh 'kubectl apply -f IronByte/frontend-deployment.yaml -n jenkins'
+sh 'kubectl config use-context minikube'
+sh 'kubectl apply -f IronByteIntern/backend-deployment.yaml -n jenkins --validate=false'
+sh 'kubectl apply -f IronByteIntern/mysql-configMap.yaml -n jenkins --validate=false'
+sh 'kubectl apply -f IronByteIntern/mysql-secrets.yaml -n jenkins --validate=false'
+sh 'kubectl apply -f IronByteIntern/db-deployment.yaml -n jenkins --validate=false'
+sh 'kubectl apply -f IronByte/frontend-deployment.yaml -n jenkins --validate=false'
             
         }
     }
