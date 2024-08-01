@@ -76,11 +76,11 @@ pipeline {
     steps {
         script {
             echo "Deploying application to Minikube..."
-            sh 'sudo kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/backend-deployment.yaml -n jenkins'
-            sh 'sudo kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/mysql-configMap.yaml -n jenkins'
-            sh 'sudo kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/mysql-secrets.yaml -n jenkins'
-            sh 'sudo kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/db-deployment.yaml -n jenkins'
-            sh 'sudo kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyte/frontend-deployment.yaml -n jenkins'
+            sh 'sudo -S kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/backend-deployment.yaml -n jenkins'
+            sh 'sudo -S kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/mysql-configMap.yaml -n jenkins'
+            sh 'sudo -S kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/mysql-secrets.yaml -n jenkins'
+            sh 'sudo -S kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/db-deployment.yaml -n jenkins'
+            sh 'sudo -S kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyte/frontend-deployment.yaml -n jenkins'
         }
     }
 }
