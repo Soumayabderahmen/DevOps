@@ -61,9 +61,14 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application using Docker Compose..."
+                    // Ensure any potential conflicts are cleared
+                    sh 'docker-compose -f docker-compose.yml down'
+                    // Start new containers
                     sh 'docker-compose -f docker-compose.yml up --build -d'
-                    sh 'docker-compose ps'  // Debug step to show the status of the Docker containers
-                    sh 'docker ps -a'  // Debug step to list all Docker containers
+                    // Debug steps to show the status of the Docker containers
+                    sh 'docker-compose ps'
+                    sh 'docker ps -a'
+                   
                 }
             }
         }
