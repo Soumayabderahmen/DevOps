@@ -72,12 +72,7 @@ pipeline {
                 }
             }
         }
-         stage('Verify Files') {
-            steps {
-                // List files to verify the file exists
-                sh 'ls -la ironbyteintern'
-            }
-        }
+        
         stage('Deploy to K8s') {
             steps {
                 script {
