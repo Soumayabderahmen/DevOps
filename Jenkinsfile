@@ -47,8 +47,8 @@ pipeline {
             steps {
                 script {
                     echo "Pushing Docker images to Docker Hub..."
-                    withCredentials([usernamePassword(credentialsId: 'soumayaabderahmen', usernameVariable: 'dockerHubUser', passwordVariable: 'dockerHubPassword')]) {
-                        sh 'echo $dockerHubPassword | docker login -u $dockerHubUser --password-stdin'
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                         // Build and push Docker images using Docker Compose
                         sh 'docker-compose -f docker-compose.yml build'
                         sh 'docker-compose -f docker-compose.yml push'
@@ -62,7 +62,7 @@ pipeline {
                 script {
                     echo "Deploying application using Docker Compose..."
                     // Ensure any potential conflicts are cleared
-                    sh 'docker-compose -f docker-compose.yml down'
+                    sh 'docker-compose -f docker-compose.yml down -v'
                     // Start new containers
                     sh 'docker-compose -f docker-compose.yml up --build -d'
                     // Debug steps to show the status of the Docker containers
