@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     echo "Checking out the repository..."
-                    git url: 'https://github.com/Soumayabderahmen/IronByte.git', branch: 'main', credentialsId: "${env.GITHUB_CREDENTIALS_ID}"
+                    git url: 'https://github.com/Soumayabderahmen/DevOps.git', branch: 'main', credentialsId: "${env.GITHUB_CREDENTIALS_ID}"
                 }
             }
         }
