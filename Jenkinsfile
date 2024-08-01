@@ -2,15 +2,15 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_CREDENTIALS_ID = 'soumayaabderahmen' // Remplacez par l'ID de vos credentials Docker
+        DOCKER_CREDENTIALS_ID = 'soumayaabderahmen' // Replace with your Docker credentials ID
         MYSQL_DATABASE = 'ironbyte'
         MYSQL_ROOT_PASSWORD = 'root'
         MYSQL_HOST = 'mysqldb'
         MYSQL_USER = 'root'
         MYSQL_PASSWORD = 'root'
         DOCKERHUB_NAMESPACE = 'soumayaabderahmen'
-        GITHUB_CREDENTIALS_ID = 'Soumaya' // Remplacez par l'ID de vos credentials GitHub
-        NODEJS_VERSION = 'NodeJS' // Remplacez par le nom de votre outil NodeJS configuré dans Jenkins
+        GITHUB_CREDENTIALS_ID = 'Soumaya' // Replace with your GitHub credentials ID
+          NODEJS_VERSION = 'NodeJS' // Remplacez par le nom de votre outil NodeJS configuré dans Jenkins
     }
     
     tools {
@@ -27,7 +27,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Build') {
             steps {
                 script {
@@ -43,45 +42,46 @@ pipeline {
             }
         }
         
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    echo "Building Docker images..."
+                    sh "docker build -t ${env.DOCKERHUB_NAMESPACE}/ironbyteintern:latest IronByteIntern"
+                    sh "docker build -t ${env.DOCKERHUB_NAMESPACE}/ironbyte:latest IronByte"
+                }
+            }
+        }
+        
         stage('Push Docker Images') {
             steps {
                 script {
                     echo "Pushing Docker images to Docker Hub..."
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                        // Build and push Docker images using Docker Compose
-                        sh 'docker-compose -f docker-compose.yml build'
-                        sh 'docker-compose -f docker-compose.yml push'
+                    withCredentials([usernamePassword(credentialsId: "${env.DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                        sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyteintern:latest"
+                        sh "docker push ${env.DOCKERHUB_NAMESPACE}/ironbyte:latest"
                     }
                 }
             }
         }
         
-        stage('Deploy with Docker Compose') {
+        stage('Deploy') {
             steps {
-                script {
-                    echo "Deploying application using Docker Compose..."
-                    // Ensure any potential conflicts are cleared
-                    sh 'docker-compose -f docker-compose.yml down -v'
-                    // Start new containers
-                    sh 'docker-compose -f docker-compose.yml up --build -d'
-                    // Debug steps to show the status of the Docker containers
-                    sh 'docker-compose ps'
-                    sh 'docker ps -a'
-                   
-                }
+                echo "Deploying application using Docker Compose..."
+                sh 'docker-compose -f docker-compose.yml up --build -d'
             }
         }
-        
+
         stage('Deploy to K8s') {
             steps {
                 script {
                     echo "Deploying application to Minikube..."
-                    sh 'kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/backend-deployment.yaml -n jenkins'
-                    sh 'kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/mysql-configMap.yaml -n jenkins'
-                    sh 'kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/mysql-secrets.yaml -n jenkins'
-                    sh 'kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyteintern/db-deployment.yaml -n jenkins'
-                    sh 'kubectl apply -f /home/soumayaab/Desktop/IRONBYTE/ironbyte/frontend-deployment.yaml -n jenkins'
+                    // Apply Kubernetes configurations in the jenkins namespace
+                    sh 'kubectl apply -f ironbyteintern/backend-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyteintern/mysql-configMap.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyteintern/mysql-secrets.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyteintern/db-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f ironbyte/frontend-deployment.yaml -n jenkins'
                 }
             }
         }
@@ -90,8 +90,6 @@ pipeline {
     post {
         always {
             echo "Pipeline completed."
-            sh 'docker-compose ps'  // Debug step to show the status of the Docker containers
-            sh 'docker ps -a'  // Debug step to list all Docker containers
         }
         success {
             echo "Pipeline succeeded."
