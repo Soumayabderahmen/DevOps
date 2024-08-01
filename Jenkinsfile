@@ -72,16 +72,21 @@ pipeline {
                 }
             }
         }
-        
+         stage('Verify Files') {
+            steps {
+                // List files to verify the file exists
+                sh 'ls -la ironbyteintern'
+            }
+        }
         stage('Deploy to K8s') {
             steps {
                 script {
                     echo "Deploying application to Minikube..."
-                    sh 'kubectl apply -f ironbyteintern/backend-deployment.yaml -n jenkins'
-                    sh 'kubectl apply -f ironbyteintern/mysql-configMap.yaml -n jenkins'
-                    sh 'kubectl apply -f ironbyteintern/mysql-secrets.yaml -n jenkins'
-                    sh 'kubectl apply -f ironbyteintern/db-deployment.yaml -n jenkins'
-                    sh 'kubectl apply -f ironbyte/frontend-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f DevOps/ironbyteintern/backend-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f DevOps/ironbyteintern/mysql-configMap.yaml -n jenkins'
+                    sh 'kubectl apply -f DevOps/ironbyteintern/mysql-secrets.yaml -n jenkins'
+                    sh 'kubectl apply -f DevOps/ironbyteintern/db-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f DevOps/ironbyte/frontend-deployment.yaml -n jenkins'
                 }
             }
         }
