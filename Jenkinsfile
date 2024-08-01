@@ -62,7 +62,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application using Docker Compose..."
-                    sh 'docker-compose -f DevOps/docker-compose.yml up --build -d'
+                    sh 'docker-compose -f IRONBYTE/docker-compose.yml up --build -d'
                     sh 'docker-compose ps'  // Debug step to show the status of the Docker containers
                     sh 'docker ps -a'  // Debug step to list all Docker containers
                 }
@@ -73,11 +73,11 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application to Minikube..."
-                    sh 'kubectl apply -f DevOps/IronByteIntern/backend-deployment.yaml -n jenkins'
-                    sh 'kubectl apply -f DevOps/IronByteIntern/mysql-configMap.yaml -n jenkins'
-                    sh 'kubectl apply -f DevOps/IronByteIntern/mysql-secrets.yaml -n jenkins'
-                    sh 'kubectl apply -f DevOps/IronByteIntern/db-deployment.yaml -n jenkins'
-                    sh 'kubectl apply -f DevOps/IronByte/frontend-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f IRONBYTE/IronByteIntern/backend-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f IRONBYTE/IronByteIntern/mysql-configMap.yaml -n jenkins'
+                    sh 'kubectl apply -f IRONBYTE/IronByteIntern/mysql-secrets.yaml -n jenkins'
+                    sh 'kubectl apply -f IRONBYTE/IronByteIntern/db-deployment.yaml -n jenkins'
+                    sh 'kubectl apply -f IRONBYTE/IronByte/frontend-deployment.yaml -n jenkins'
                 }
             }
         }
