@@ -50,8 +50,8 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'soumayaabderahmen', usernameVariable: 'dockerHubUser', passwordVariable: 'dockerHubPassword')]) {
                         sh 'echo $dockerHubPassword | docker login -u $dockerHubUser --password-stdin'
                         // Build and push Docker images using Docker Compose
-                        sh 'docker-compose -f IRONBYTE/docker-compose.yml build'
-                        sh 'docker-compose -f IRONBYTE/docker-compose.yml push'
+                        sh 'docker-compose -f docker-compose.yml build'
+                        sh 'docker-compose -f docker-compose.yml push'
                     }
                 }
             }
@@ -61,7 +61,7 @@ pipeline {
             steps {
                 script {
                     echo "Deploying application using Docker Compose..."
-                    sh 'docker-compose -f IRONBYTE/docker-compose.yml up --build -d'
+                    sh 'docker-compose -f docker-compose.yml up --build -d'
                     sh 'docker-compose ps'  // Debug step to show the status of the Docker containers
                     sh 'docker ps -a'  // Debug step to list all Docker containers
                 }
